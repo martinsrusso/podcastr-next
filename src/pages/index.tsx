@@ -4,6 +4,8 @@ import ptBR from 'date-fns/locale/pt-BR'
 import { api } from '../services/api';
 import { convertDurationToTimeString } from '../utils/convertDurationToTimeString';
 
+import styles from './home.module.scss';
+
 type File = {
     url: string;
     type: string;
@@ -15,24 +17,67 @@ type Episodes = {
         title: string;
         members: string;
         published_at: string;
+        publishedAt: string;
+        durationAsString: string;
         thumbnail: string;
         description: string;
+        url: string;
+        type: string;
+        duration: number;
         file: File;
 }
 
 type HomeProps = {
-    episodes: Episodes; //ou Array<Episodes>
+    //episodes: Episodes[]; //ou Array<Episodes>
+    latesEpisodes: Episodes[];
+    allEpisodes: Episodes[];
 }
 
-export default function Home(props: HomeProps) {
+export default function Home( { latesEpisodes, allEpisodes }: HomeProps ) {
     return (
-        <div>
-            <h1>Index</h1>
+        <div className={styles.homepage}>
 
-            <p>{JSON.stringify(props.episodes)}</p>
+           <section className={styles.latesEpisodes}>
+                <h2>Últimos Lançamentos</h2>
+
+                <ul>
+                    {latesEpisodes.map(episode =>{
+                        return (
+                         <li key={episode.id}>
+                             <img src={episode.thumbnail} alt={episode.title}/>
+
+                             <div className={styles.episodeDetails}>
+                                 <a href="">{episode.title}</a>
+                                 <p>{episode.members}</p>
+                                 <span>{episode.publishedAt}</span>
+                                 <span>{episode.durationAsString}</span>
+                             </div>
+
+                             <button type="button">
+                                 <img src="/play-green.svg" alt="Tocar episódio"/>
+                             </button>
+                         </li>
+                        )
+                    })}
+                </ul>
+
+           </section>
+
+           <section className={styles.allEpisodes}>
+               
+           </section>
+
         </div>
     )
 }
+/*
+return (
+        <div>
+            <h1>Index</h1>
+            <p>{JSON.stringify(props.episodes)}</p>
+        </div>
+    )
+*/
 
 //Usando o fecth
 /*
@@ -86,10 +131,14 @@ export const getStaticProps: GetStaticProps = async () => {
             type: episode.file.type
         };
     });
+
+    const latesEpisodes = episodes.slice(0, 2);
+    const allEpisodes = episodes.slice(2, episodes.length);
     
     return {
         props: {
-            episodes,
+            latesEpisodes,
+            allEpisodes
         },
         revalidate: 60 * 60 * 8,
     }
