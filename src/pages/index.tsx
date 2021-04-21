@@ -2,6 +2,7 @@ import { GetStaticProps } from 'next';
 import { format, parseISO } from 'date-fns'
 import ptBR from 'date-fns/locale/pt-BR'
 import { api } from '../services/api';
+import { convertDurationToTimeString } from '../utils/convertDurationToTimeString';
 
 type File = {
     url: string;
@@ -81,13 +82,14 @@ export const getStaticProps: GetStaticProps = async () => {
             description: episode.description,
             url: episode.file.url,
             duration: Number(episode.file.duration),
+            durationAsString: convertDurationToTimeString(Number(episode.file.duration)),
             type: episode.file.type
         };
     });
     
     return {
         props: {
-            episodes: data,
+            episodes,
         },
         revalidate: 60 * 60 * 8,
     }
